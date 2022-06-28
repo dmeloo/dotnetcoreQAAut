@@ -58,7 +58,7 @@ namespace MvcCode
                 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
                 {
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.ResponseType = OpenIdConnectResponseType.CodeIdTokenToken;
+                    options.ResponseType = OpenIdConnectResponseType.Code;
                     options.RequireHttpsMetadata = true;
                     options.Authority = String.Format(System.Globalization.CultureInfo.InvariantCulture, authority, "common");
                     options.ClientId = clientId;
