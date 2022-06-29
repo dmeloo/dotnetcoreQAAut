@@ -43,7 +43,14 @@ namespace MvcCode
                "ServerSettings:redirectUriLogout");
 
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+            services.AddDistributedMemoryCache();
 
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
             services.AddControllersWithViews();
             services.ConfigureApplicationCookie(options =>
             {
@@ -78,7 +85,7 @@ namespace MvcCode
                     options.Scope.Add("email");
                     options.UseTokenLifetime = false;
                     options.GetClaimsFromUserInfoEndpoint = true;
-                    options.SaveTokens = true;
+                    options.SaveTokens = false;
                     options.SecurityTokenValidator = new JwtSecurityTokenHandler
                     {
                         InboundClaimTypeMap = new Dictionary<string, string>()
@@ -146,14 +153,12 @@ namespace MvcCode
 
         public void Configure(IApplicationBuilder app)
         {
-            
-
             app.UseDeveloperExceptionPage();
             //app.UseHttpsRedirection();
              app.UseStaticFiles();
             app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedProto });
             app.UseRouting();
-
+            app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
             
