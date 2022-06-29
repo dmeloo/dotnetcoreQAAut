@@ -139,11 +139,12 @@ namespace MvcCode
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
+            
 
             app.UseDeveloperExceptionPage();
             //app.UseHttpsRedirection();
-             app.UseStaticFiles();            
+             app.UseStaticFiles();
+            app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
             app.UseRouting();
 
             app.UseAuthentication();
