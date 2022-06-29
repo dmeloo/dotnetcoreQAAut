@@ -144,7 +144,7 @@ namespace MvcCode
             app.UseDeveloperExceptionPage();
             //app.UseHttpsRedirection();
              app.UseStaticFiles();
-            app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
+            app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedProto });
             app.UseRouting();
 
             app.UseAuthentication();
