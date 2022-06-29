@@ -133,7 +133,7 @@ namespace MvcCode
                     };
 
                 });
-            services.AddSession();
+
         }
 
         public void Configure(IApplicationBuilder app)
@@ -147,8 +147,7 @@ namespace MvcCode
 
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseSession();
-            app.UseCookiePolicy();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute()
