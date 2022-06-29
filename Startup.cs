@@ -13,6 +13,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace MvcCode
 {
@@ -147,6 +148,9 @@ namespace MvcCode
 
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
+
+
 
             app.UseEndpoints(endpoints =>
             {
