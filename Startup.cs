@@ -48,17 +48,17 @@ namespace MvcCode
 
             services.AddAuthentication(options =>
             {
-                //options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                //options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
-                    //options.Cookie.Name = CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.Cookie.Name = CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationScheme;
                     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);   
                 })
                 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
                 {
-                    //options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.ResponseType = OpenIdConnectResponseType.Code;
                     options.RequireHttpsMetadata = true;
                     options.Authority = String.Format(System.Globalization.CultureInfo.InvariantCulture, authority, "common");
@@ -149,7 +149,11 @@ namespace MvcCode
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
-
+            //app.UseCookieAuthentication(new CookieAuthenticationOptions()
+            //{
+            //    AuthenticationScheme = "Cookies",
+            //    AutomaticAuthenticate = true
+            //});
 
 
             app.UseEndpoints(endpoints =>
