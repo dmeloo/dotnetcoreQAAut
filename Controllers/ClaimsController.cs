@@ -48,9 +48,8 @@ namespace MvcCode.Controllers
         {
             var httpClient = new HttpClient();
             var userInfo = new UserInfoRequest();
-
-            var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
-            //You get the user's first and last name below:
+            /*
+             //You get the user's first and last name below:
             ViewBag.Name = userClaims?.FindFirst("audd")?.Value;
 
             // The 'preferred_username' claim can be used for showing the username
@@ -67,9 +66,11 @@ namespace MvcCode.Controllers
             userInfo.Token = userClaims?.FindFirst("access_token")?.Value;
 
             var userInfoProfile = await httpClient.GetUserInfoAsync(userInfo);
+            */
+            var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
 
-            ViewBag.userClaims = userInfoProfile.Claims;
-
+            ViewBag.userClaims = userClaims.Claims;
+           
             return View();
         }
         [AllowAnonymous]

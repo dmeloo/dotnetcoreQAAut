@@ -48,15 +48,15 @@ namespace MvcCode
 
             services.AddAuthentication(options =>
             {
-                options.DefaultScheme = "cookie";
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
-                    options.Cookie.Name = "cookie";
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);   
+                    options.Cookie.Name = CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                 })
-                .AddOpenIdConnect("cookie", options =>
+                .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
                 {
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.ResponseType = OpenIdConnectResponseType.Code;
@@ -120,15 +120,15 @@ namespace MvcCode
                         },
                         OnTokenValidated = context =>
                         {
-                            var userClaims = context.Principal!.Identity as System.Security.Claims.ClaimsIdentity;
-                            if(userClaims != null)
+                            /*var userClaims = context.Principal!.Identity as System.Security.Claims.ClaimsIdentity;
+                            if (userClaims != null)
                             {
                                 userClaims.AddClaim(new Claim("id_token", context.ProtocolMessage.IdToken));
                                 userClaims.AddClaim(new Claim("access_token", context.ProtocolMessage.AccessToken));
                                 userClaims.AddClaim(new Claim("audd", userClaims!.FindFirst("aud")!.Value));
                                 userClaims.AddClaim(new Claim("isss", userClaims!.FindFirst("iss")!.Value));
                             }
-                            
+                            */
                             return Task.CompletedTask;
                         },
                     };
@@ -137,19 +137,18 @@ namespace MvcCode
 
         }
 
-
         public void Configure(IApplicationBuilder app)
         {
 
             app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
+            
             //app.UseCookieAuthentication(new CookieAuthenticationOptions()
             //{
             //    AuthenticationScheme = "Cookies",
