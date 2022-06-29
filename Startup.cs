@@ -48,8 +48,8 @@ namespace MvcCode
 
             services.AddAuthentication(options =>
             {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                //options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                //options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
