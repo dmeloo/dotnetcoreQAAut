@@ -45,7 +45,14 @@ namespace MvcCode
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
             services.AddControllersWithViews();
-
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = $"/";
+                options.Cookie.Name = "EntidadCookie";
+                options.SlidingExpiration = true;
+                int val = int.Parse(Configuration["ServerSettings:CookieLifetime"]);
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(val);
+            });
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;

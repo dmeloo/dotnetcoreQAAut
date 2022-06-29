@@ -38,6 +38,7 @@ namespace MvcCode.Controllers
         [HttpGet]
         public async Task<IActionResult> Callback(string returnUrl = null, string remoteError = null)
         {
+            
             // read external identity from the temporary cookie
             var result = await HttpContext.AuthenticateAsync(OpenIdConnectDefaults.AuthenticationScheme);
             if (result?.Succeeded != true)
@@ -56,7 +57,7 @@ namespace MvcCode.Controllers
 //            await HttpContext.SignInAsync(user.Id, name, provider, localSignInProps, additionalLocalClaims.ToArray());
 
             await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
-
+            
 
             if (/*_interaction.IsValidReturnUrl(returnUrl) || */Url.IsLocalUrl(returnUrl))
             {
