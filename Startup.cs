@@ -48,15 +48,15 @@ namespace MvcCode
 
             services.AddAuthentication(options =>
             {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultScheme = "cookie";
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
-                    options.Cookie.Name = CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.Cookie.Name = "cookie";
                     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);   
                 })
-                .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
+                .AddOpenIdConnect("cookie", options =>
                 {
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.ResponseType = OpenIdConnectResponseType.Code;
