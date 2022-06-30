@@ -77,29 +77,13 @@ namespace MvcCode.Controllers
         public async Task<IActionResult> GetClaims() {
             if (!User.Identity!.IsAuthenticated)
                 return Json(new object());
-            var httpClient = new HttpClient();
-            var userInfo = new UserInfoRequest();
-
             var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
-            //You get the user's first and last name below:
-            ViewBag.Name = userClaims?.FindFirst("audd")?.Value;
 
-            // The 'preferred_username' claim can be used for showing the username
-            ViewBag.Username = userClaims?.FindFirst("audd")?.Value;
-
-            // The subject/ NameIdentifier claim can be used to uniquely identify the user across the web
-            ViewBag.Subject = userClaims?.FindFirst("sub")?.Value;
-
-            // TenantId is the unique Tenant Id - which represents an organization in Azure AD
-            ViewBag.TenantId = userClaims?.FindFirst("isss")?.Value;
-            string authority = _configuration.GetValue<string>(
-               "ServerSettings:authority");
-            userInfo.Address = authority + "/connect/userinfo";
-            userInfo.Token = userClaims?.FindFirst("access_token")?.Value;
-
-            var userInfoProfile = await httpClient.GetUserInfoAsync(userInfo);
+            ViewBag.userClaims = userClaims.Claims;
+           
+            //var userInfoProfile = await httpClient.GetUserInfoAsync(userInfo);
             AutenticacionDigital result = new AutenticacionDigital();
-            foreach (var claim in userInfoProfile.Claims)
+            foreach (var claim in userClaims.Claims)
             {
                 Type t = result.GetType();
                 var p = t.GetProperty(claim.Type);

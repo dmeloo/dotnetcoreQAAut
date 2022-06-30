@@ -149,6 +149,8 @@ namespace MvcCode
 
                 });
 
+            services.AddSession();
+
         }
 
         public void Configure(IApplicationBuilder app)
@@ -161,12 +163,9 @@ namespace MvcCode
             app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
-            
-            //app.UseCookieAuthentication(new CookieAuthenticationOptions()
-            //{
-            //    AuthenticationScheme = "Cookies",
-            //    AutomaticAuthenticate = true
-            //});
+
+
+            app.UseSession();
 
 
             app.UseEndpoints(endpoints =>
