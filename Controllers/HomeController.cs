@@ -57,9 +57,11 @@ namespace MvcCode.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var url = this.HttpContext.Session!.GetString("urlCallback");
-            if (!string.IsNullOrWhiteSpace(url))
+            var url = this.HttpContext.Request.Cookies.ContainsKey("urlCallback")?this.HttpContext.Request.Cookies["urlCallback"]:"";
+            if (!string.IsNullOrWhiteSpace(url)){
+                //this.HttpContext.Response.Cookies.Delete("urlCallback");
                 return Redirect(url);
+            }
             url = this.HttpContext.Session!.GetString("origen");
             if (url != null)
             {
@@ -74,9 +76,6 @@ namespace MvcCode.Controllers
 
         public IActionResult Login()
         {
-            var url = this.HttpContext.Session!.GetString("urlCallback");
-            if (!string.IsNullOrWhiteSpace(url))
-                return Redirect(url);
             var authenticationProperties = new AuthenticationProperties();
             authenticationProperties.RedirectUri = Url.Action(nameof(Callback));
             return Challenge(authenticationProperties, OpenIdConnectDefaults.AuthenticationScheme);
@@ -84,10 +83,10 @@ namespace MvcCode.Controllers
         [AllowAnonymous]
         public IActionResult Login1(string redirect, string urlCallback)
         {
-            if (!string.IsNullOrWhiteSpace(redirect))
-                this.HttpContext.Session.SetString("origen", redirect);
             if (!string.IsNullOrWhiteSpace(urlCallback))
-                this.HttpContext.Session.SetString("urlCallback", urlCallback);
+                this.HttpContext.Response.Cookies.Append("urlCallback", urlCallback);
+            if (!string.IsNullOrWhiteSpace(redirect))
+                this.HttpContext.Session.SetString("redirect", redirect);
             return Redirect("Login");
         }
         [HttpGet]
