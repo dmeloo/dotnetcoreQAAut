@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace MvcCode.Controllers
 {
@@ -39,10 +40,12 @@ namespace MvcCode.Controllers
     }
     public class ClaimsController : Controller
     {
-        private readonly IConfiguration _configuration;
-        public ClaimsController(IConfiguration _config)
+        private readonly IConfiguration _configuration;       
+        private readonly IMemoryCache _cache;
+        public ClaimsController(IConfiguration _config, IMemoryCache cache)
         {
             _configuration = _config;
+            _cache = cache;
         }
         public async Task<IActionResult> IndexAsync()
         {
@@ -73,8 +76,18 @@ namespace MvcCode.Controllers
            
             return View();
         }
+
+
         [AllowAnonymous]
-        public async Task<IActionResult> GetClaims() {
+        //[HttpGet("GetClaims/{sub}")]
+        public async Task<IActionResult> GetClaims(string sub) {
+            if(!string.IsNullOrWhiteSpace(sub)){
+                Console.WriteLine(sub);
+            AutenticacionDigital c;
+            if(_cache.TryGetValue(sub, out c)){
+                return Json(c);
+            }
+        }
             if (!User.Identity!.IsAuthenticated)
                 return Json(new object());
             var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;

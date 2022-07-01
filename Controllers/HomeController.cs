@@ -15,12 +15,16 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
+
 
 namespace MvcCode.Controllers
 {
     public class HomeController : Controller
     {
         private readonly IConfiguration _configuration;
+        
+        private readonly IMemoryCache _cache;
 
         private async Task<int> GetClaims()
         {
@@ -50,17 +54,46 @@ namespace MvcCode.Controllers
             return 1;
         }
 
-        public HomeController(IConfiguration _config)
+        public HomeController(IConfiguration _config, IMemoryCache cache)
         {
             _configuration = _config;
+            _cache = cache;
         }
+
+        public AutenticacionDigital GetClaims_() {
+
+            var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
+            //var userInfoProfile = await httpClient.GetUserInfoAsync(userInfo);
+            AutenticacionDigital result = new AutenticacionDigital();
+            if(userClaims==null)
+                return result;
+            foreach (var claim in userClaims.Claims)
+            {
+                Type t = result.GetType();
+                var p = t.GetProperty(claim.Type);
+                if (p != null)
+                {
+                    p.SetValue(result, claim.Value);
+                }
+            }
+
+            return result;
+        }
+
+        private string Storage(){
+            var claims = GetClaims_();
+            _cache.Set(claims.sub,claims);
+            return claims.sub;
+        }
+
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var url = this.HttpContext.Request.Cookies.ContainsKey("urlCallback")?this.HttpContext.Request.Cookies["urlCallback"]:"";
-            if (!string.IsNullOrWhiteSpace(url)){
+            if (User.Identity!.IsAuthenticated && !string.IsNullOrWhiteSpace(url)){
+                
                 //this.HttpContext.Response.Cookies.Delete("urlCallback");
-                return Redirect(url);
+                return Redirect(url+"?guid="+Storage());
             }
             url = this.HttpContext.Session!.GetString("origen");
             if (url != null)

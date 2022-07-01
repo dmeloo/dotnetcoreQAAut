@@ -151,6 +151,7 @@ namespace MvcCode
 
             services.AddSession();
 
+	services.AddMemoryCache();
         }
 
         public void Configure(IApplicationBuilder app)
