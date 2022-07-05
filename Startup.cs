@@ -160,7 +160,8 @@ namespace MvcCode
                 {
                     builder.AllowAnyOrigin()
                      .AllowAnyMethod()
-                     .AllowAnyHeader();
+                     .AllowAnyHeader()
+                     .AllowCredentials();
                 });
             });
         }

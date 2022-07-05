@@ -78,7 +78,7 @@ namespace MvcCode.Controllers
             return View();
         }
 
-        [EnableCors("PermitirApiRequest")]
+        [EnableCors]
         [AllowAnonymous]
         //[HttpGet("GetClaims/{guid}")]
         public async Task<IActionResult> GetClaims(string guid) {
