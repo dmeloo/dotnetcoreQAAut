@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Polly;
 using System;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -165,6 +166,13 @@ namespace MvcCode
                      ;
                 });
             });
+
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+            //This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
         }
 
         public void Configure(IApplicationBuilder app)
@@ -184,6 +192,8 @@ namespace MvcCode
             .AllowAnyOrigin()
             .AllowAnyMethod()
             .AllowAnyHeader());
+            
+            app.UseCookiePolicy();
 
             app.UseEndpoints(endpoints =>
             {
