@@ -160,10 +160,11 @@ namespace MvcCode
                 options.AddPolicy("PermitirApiRequest",
                 builder =>
                 {
-                    builder.AllowAnyOrigin()
+                    builder.WithOrigins("https://oic-alcaldia-villanueva-idkmfwanfmgl-ia.integration.ocp.oraclecloud.com",
+                     "https://oic-alcaldia-villanueva-idkmfwanfmgl-ia.integration.ocp.oraclecloud.com/ic/builder/design/appCertificadoResidencia/1.0.36/preview/webApps/webappcertificadoresidencia/")
                      .AllowAnyMethod()
-                     .AllowAnyHeader().AllowCredentials()
-                     .WithOrigins("https://oic-alcaldia-villanueva-idkmfwanfmgl-ia.integration.ocp.oraclecloud.com")
+                     .AllowAnyHeader()
+                     .AllowCredentials()
                      ;
                 });
             });
