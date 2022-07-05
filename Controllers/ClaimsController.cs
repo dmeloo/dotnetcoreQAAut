@@ -79,12 +79,12 @@ namespace MvcCode.Controllers
 
 
         [AllowAnonymous]
-        //[HttpGet("GetClaims/{sub}")]
-        public async Task<IActionResult> GetClaims(string sub) {
-            if(!string.IsNullOrWhiteSpace(sub)){
-                Console.WriteLine(sub);
+        //[HttpGet("GetClaims/{guid}")]
+        public async Task<IActionResult> GetClaims(string guid) {
+            if(!string.IsNullOrWhiteSpace(guid)){
+                
             AutenticacionDigital c;
-            if(_cache.TryGetValue(sub, out c)){
+            if(_cache.TryGetValue(guid, out c)){
                 return Json(c);
             }
         }
