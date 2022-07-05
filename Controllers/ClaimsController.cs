@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Cors;
 
 namespace MvcCode.Controllers
 {
@@ -77,7 +78,7 @@ namespace MvcCode.Controllers
             return View();
         }
 
-
+        [EnableCors("PermitirApiRequest")]
         [AllowAnonymous]
         //[HttpGet("GetClaims/{guid}")]
         public async Task<IActionResult> GetClaims(string guid) {
