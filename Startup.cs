@@ -161,7 +161,8 @@ namespace MvcCode
                 builder =>
                 {
                     builder.WithOrigins("https://oic-alcaldia-villanueva-idkmfwanfmgl-ia.integration.ocp.oraclecloud.com",
-                     "https://oic-alcaldia-villanueva-idkmfwanfmgl-ia.integration.ocp.oraclecloud.com/ic/builder/design/appCertificadoResidencia/1.0.36/preview/webApps/webappcertificadoresidencia/")
+                     "https://oic-alcaldia-villanueva-idkmfwanfmgl-ia.integration.ocp.oraclecloud.com/ic/builder/design/appCertificadoResidencia/1.0.36/preview/webApps/webappcertificadoresidencia/",
+                     "https://www.w3schools.com")
                      .AllowAnyMethod()
                      .AllowAnyHeader()
                      .AllowCredentials()
