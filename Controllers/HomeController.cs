@@ -231,5 +231,17 @@ namespace MvcCode.Controllers
                "ServerSettings:redirectUri");
             return Challenge(authenticationProperties, OpenIdConnectDefaults.AuthenticationScheme);
         }
+
+        [AllowAnonymous]
+        public IActionResult Alive(){
+            if(User.Identity!.IsAuthenticated)
+                return View();
+            return View("index");
+        }
+        [AllowAnonymous]
+
+        public IActionResult KeepAlive(){
+            return Json(new object());
+        }
     }
 }

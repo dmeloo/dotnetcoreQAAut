@@ -1,0 +1,83 @@
+﻿@using IdentityModel.Client;
+@{
+    ViewData["Title"] = "Home Page";
+    var url = ViewBag.Url;
+    UserInfoResponse claims = ViewBag.userInfoProfile;
+
+}
+
+
+@if (User.Identity!.IsAuthenticated)
+{
+    <script type="text/javascript">
+        function callrequest(){
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+            
+            }
+            xhttp.open("GET", "KeepAlive", true);
+            xhttp.send();
+        }
+
+        setInterval(callrequest,60000);
+    </script>
+    ViewBag.Title = "User autorized";
+    var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
+    var user = userClaims!.FindFirst("audd");
+
+
+    @if (!string.IsNullOrWhiteSpace(url))
+    {
+        <form id="toOracle" style="" method="post" action="@url">
+            @foreach (var item in claims.Claims)
+            {
+            <input type="text" name="@item.Type" value="@item.Value" />
+            }
+        <input id="_submit" type="submit" name="sub" value="" />
+        </form>
+        <script type="text/javascript">
+            //document.forms[0].submit();
+            document.getElementById("_submit").click();
+        </script>
+    }
+    <h2>@ViewBag.Title.</h2>
+    <h3 style="margin-bottom:5rem">Welcome <b>@user</b></h3>
+
+    <p>Use this area to provide additional information.</p>
+
+    <div class="col-md-12">
+        @Html.ActionLink("See Your Claims", "Index", "Claims", null, new { @class = "btn btn-primary" })
+    </div>
+    <div class="col-md-12">
+        <br />
+        @Html.ActionLink("Personalizar", "Personalizar", "Home", null, new { @class = "btn btn-primary" })
+    </div>
+    <div class="col-md-12">
+        <br />
+        @Html.ActionLink("Single Sign Out", "SingleSignOut", "Home", null, new { @class = "btn btn-primary" })
+    </div>
+    <div class="col-md-12">
+        <br />
+        @Html.ActionLink("Logout", "Logout", "Home", null, new { @class = "btn btn-danger" })
+    </div>
+}
+else
+{
+    <div class="text-center">
+        <h1 class="display-4">Welcome</h1>
+        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    </div>
+    <ul>
+    @foreach (var val in Context.Request.Headers)
+    {
+        <li> @val.Key = @val.Value</li>
+    }
+    </ul>
+    
+}
+}
+
+@if (!string.IsNullOrWhiteSpace(Context.Request.Query["errormessage"]))
+{
+    <div style="background-color:red;color:white;font-weight: bold;">Error: @Context.Request.Query["errormessage"]</div>
+}
