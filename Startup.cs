@@ -160,8 +160,9 @@ namespace MvcCode
                 {
                     builder.AllowAnyOrigin()
                      .AllowAnyMethod()
-                     .AllowAnyHeader()
-                     .AllowCredentials();
+                     .AllowAnyHeader().AllowCredentials()
+                     .WithOrigins("https://oic-alcaldia-villanueva-idkmfwanfmgl-ia.integration.ocp.oraclecloud.com")
+                     ;
                 });
             });
         }
