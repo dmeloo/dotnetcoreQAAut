@@ -189,10 +189,7 @@ namespace MvcCode
 
 
             app.UseSession();
-            app.UseCors(builder => builder
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+            app.UseCors("PermitirApiRequest");
             
             //app.UseCookiePolicy();
 
