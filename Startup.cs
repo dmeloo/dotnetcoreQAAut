@@ -152,6 +152,17 @@ namespace MvcCode
             services.AddSession();
 
 	services.AddMemoryCache();
+
+    services.AddCors(options =>
+            {
+                options.AddPolicy("PermitirApiRequest",
+                builder =>
+                {
+                    builder.AllowAnyOrigin()
+                     .AllowAnyMethod()
+                     .AllowAnyHeader();
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app)
@@ -167,7 +178,10 @@ namespace MvcCode
 
 
             app.UseSession();
-
+            app.UseCors(builder => builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
 
             app.UseEndpoints(endpoints =>
             {
