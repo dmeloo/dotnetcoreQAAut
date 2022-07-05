@@ -70,7 +70,7 @@ namespace MvcCode
                 {
                     options.Cookie.Name = CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationScheme;
                     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                    options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
+                    options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
                 })
                 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
                 {
