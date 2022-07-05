@@ -28,6 +28,9 @@ namespace MvcCode
         }
         public void ConfigureServices(IServiceCollection services)
         {
+            string corsUrl = Configuration.GetValue<string>(
+               "ServerSettings:corsUrl");
+
             string redirectUri = Configuration.GetValue<string>(
                "ServerSettings:redirectUri");
 
@@ -160,9 +163,7 @@ namespace MvcCode
                 options.AddPolicy("PermitirApiRequest",
                 builder =>
                 {
-                    builder.WithOrigins("https://oic-alcaldia-villanueva-idkmfwanfmgl-ia.integration.ocp.oraclecloud.com",
-                     "https://oic-alcaldia-villanueva-idkmfwanfmgl-ia.integration.ocp.oraclecloud.com/ic/builder/design/appCertificadoResidencia/1.0.36/preview/webApps/webappcertificadoresidencia/",
-                     "https://www.w3schools.com")
+                    builder.WithOrigins(corsUrl??"https://localhost:5001/")
                      .AllowAnyMethod()
                      .AllowAnyHeader()
                      .AllowCredentials()
