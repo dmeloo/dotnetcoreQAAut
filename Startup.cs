@@ -70,6 +70,7 @@ namespace MvcCode
                 {
                     options.Cookie.Name = CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationScheme;
                     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                    options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
                 })
                 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
                 {
@@ -167,12 +168,12 @@ namespace MvcCode
                 });
             });
 
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-            //This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
+            // services.Configure<CookiePolicyOptions>(options =>
+            // {
+            // //This lambda determines whether user consent for non-essential cookies is needed for a given request.
+            //     options.CheckConsentNeeded = context => true;
+            //     options.MinimumSameSitePolicy = SameSiteMode.None;
+            // });
         }
 
         public void Configure(IApplicationBuilder app)
@@ -193,7 +194,7 @@ namespace MvcCode
             .AllowAnyMethod()
             .AllowAnyHeader());
             
-            app.UseCookiePolicy();
+            //app.UseCookiePolicy();
 
             app.UseEndpoints(endpoints =>
             {
