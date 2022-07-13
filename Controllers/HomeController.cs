@@ -23,36 +23,9 @@ namespace MvcCode.Controllers
     public class HomeController : Controller
     {
         private readonly IConfiguration _configuration;
-        
+
         private readonly IMemoryCache _cache;
 
-        private async Task<int> GetClaims()
-        {
-            if (!User.Identity!.IsAuthenticated)
-                return 1;
-            var httpClient = new HttpClient();
-            var userInfo = new UserInfoRequest();
-
-            var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
-            //You get the user's first and last name below:
-            ViewBag.Name = userClaims?.FindFirst("audd")?.Value;
-
-            // The 'preferred_username' claim can be used for showing the username
-            ViewBag.Username = userClaims?.FindFirst("audd")?.Value;
-
-            // The subject/ NameIdentifier claim can be used to uniquely identify the user across the web
-            ViewBag.Subject = userClaims?.FindFirst("sub")?.Value;
-
-            // TenantId is the unique Tenant Id - which represents an organization in Azure AD
-            ViewBag.TenantId = userClaims?.FindFirst("isss")?.Value;
-            string authority = _configuration.GetValue<string>(
-               "ServerSettings:authority");
-            userInfo.Address = authority + "/connect/userinfo";
-            userInfo.Token = userClaims?.FindFirst("access_token")?.Value;
-
-            ViewBag.userInfoProfile = await httpClient.GetUserInfoAsync(userInfo);
-            return 1;
-        }
 
         public HomeController(IConfiguration _config, IMemoryCache cache)
         {
@@ -60,52 +33,29 @@ namespace MvcCode.Controllers
             _cache = cache;
         }
 
-        public AutenticacionDigital GetClaims_() {
-
-            var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
-            //var userInfoProfile = await httpClient.GetUserInfoAsync(userInfo);
-            AutenticacionDigital result = new AutenticacionDigital();
-            if(userClaims==null)
-                return result;
-            foreach (var claim in userClaims.Claims)
-            {
-                Type t = result.GetType();
-                var p = t.GetProperty(claim.Type);
-                if (p != null)
-                {
-                    p.SetValue(result, claim.Value);
-                }
-            }
-
-            return result;
-        }
-
-        private string Storage(){
-            var claims = GetClaims_();
-            _cache.Set(claims.sub,claims);
-            return claims.sub;
-        }
-
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var url = this.HttpContext.Request.Cookies.ContainsKey("urlCallback")?this.HttpContext.Request.Cookies["urlCallback"]:"";
-            if (User.Identity!.IsAuthenticated && !string.IsNullOrWhiteSpace(url)){
-                
-                //this.HttpContext.Response.Cookies.Delete("urlCallback");
-                return Redirect(url+"?guid="+Storage());
-            }
-            url = this.HttpContext.Session!.GetString("origen");
-            if (url != null)
+            var url = this.HttpContext.Request.Cookies.ContainsKey("urlCallback") ? this.HttpContext.Request.Cookies["urlCallback"] : "index";
+            if (User.Identity!.IsAuthenticated && !string.IsNullOrWhiteSpace(url))
             {
-                ViewBag.Url = url;
-                var i = await GetClaims();
+                return Redirect(url);
             }
 
             return View();
         }
+        [AllowAnonymous]
+        public IActionResult Logout()
+        {
+            if (!User.Identity!.IsAuthenticated)
+            {
+                var url = this.HttpContext.Request.Cookies.ContainsKey("urlCallback") ? this.HttpContext.Request.Cookies["urlCallback"] : "index";
+                return Redirect(url);
+            }
 
-        public IActionResult Logout() => SignOut(CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme);
+            return SignOut(CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme);
+
+        }
 
         public IActionResult Login()
         {
@@ -125,7 +75,7 @@ namespace MvcCode.Controllers
         [HttpGet]
         public async Task<IActionResult> Callback(string returnUrl = null, string remoteError = null)
         {
-            
+
             // read external identity from the temporary cookie
             var result = await HttpContext.AuthenticateAsync(OpenIdConnectDefaults.AuthenticationScheme);
             if (result?.Succeeded != true)
@@ -141,10 +91,10 @@ namespace MvcCode.Controllers
             ProcessLoginCallbackForOidc(result, additionalLocalClaims, localSignInProps);
 
 
-//            await HttpContext.SignInAsync(user.Id, name, provider, localSignInProps, additionalLocalClaims.ToArray());
+            //            await HttpContext.SignInAsync(user.Id, name, provider, localSignInProps, additionalLocalClaims.ToArray());
 
             await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
-            
+
 
             if (/*_interaction.IsValidReturnUrl(returnUrl) || */Url.IsLocalUrl(returnUrl))
             {
@@ -233,14 +183,16 @@ namespace MvcCode.Controllers
         }
 
         [AllowAnonymous]
-        public IActionResult Alive(){
-            if(User.Identity!.IsAuthenticated)
+        public IActionResult Alive()
+        {
+            if (User.Identity!.IsAuthenticated)
                 return View();
             return View("index");
         }
         [AllowAnonymous]
 
-        public IActionResult KeepAlive(){
+        public IActionResult KeepAlive()
+        {
             return Json(new object());
         }
     }

@@ -79,7 +79,7 @@ namespace MvcCode
                 {
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.ResponseType = OpenIdConnectResponseType.Code;
-                    options.RequireHttpsMetadata = true;
+                    //options.RequireHttpsMetadata = true;
                     options.Authority = String.Format(System.Globalization.CultureInfo.InvariantCulture, authority, "common");
                     options.ClientId = clientId;
                     options.ClientSecret = clientSecret;
