@@ -90,7 +90,7 @@ namespace MvcCode
                     options.Scope.Add("email");
                     options.UseTokenLifetime = false;
                     options.GetClaimsFromUserInfoEndpoint = true;
-                    options.SaveTokens = false;
+                    options.SaveTokens = true;
                     options.SecurityTokenValidator = new JwtSecurityTokenHandler
                     {
                         InboundClaimTypeMap = new Dictionary<string, string>()
