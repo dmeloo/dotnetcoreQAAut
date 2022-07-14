@@ -101,6 +101,19 @@ namespace MvcCode
                     options.TokenValidationParameters.ValidateIssuer = false;
                     options.Events = new OpenIdConnectEvents
                     {
+                        OnRedirectToIdentityProviderForSignOut = context =>{
+                            Console.WriteLine("logot event");
+                            var authInfo = context.Properties.GetTokenValue("id_token");
+                            var idToken = context.HttpContext.GetTokenAsync("id_token");
+                            Console.WriteLine(idToken.Result);
+
+                            if(idToken.Result != null && !context.Properties.Items.ContainsKey("id_token_hint"))
+                                context.ProtocolMessage.SetParameter("id_token_hint",idToken.Result);
+                            context.ProtocolMessage.IdToken = idToken.Result;
+
+                            Console.WriteLine(context.ProtocolMessage.IdToken);
+                            return Task.FromResult(0);
+                        },
                         OnRedirectToIdentityProvider = context =>
                         {
                             if (context.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
@@ -139,6 +152,7 @@ namespace MvcCode
                         },
                         OnTokenValidated = context =>
                         {
+                            Console.WriteLine("Set Claims");
                             /*var userClaims = context.Principal!.Identity as System.Security.Claims.ClaimsIdentity;
                             if (userClaims != null)
                             {
@@ -146,8 +160,8 @@ namespace MvcCode
                                 userClaims.AddClaim(new Claim("access_token", context.ProtocolMessage.AccessToken));
                                 userClaims.AddClaim(new Claim("audd", userClaims!.FindFirst("aud")!.Value));
                                 userClaims.AddClaim(new Claim("isss", userClaims!.FindFirst("iss")!.Value));
-                            }
-                            */
+                            }*/
+                            
                             return Task.CompletedTask;
                         },
                     };

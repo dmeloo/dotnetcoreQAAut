@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewData["Title"] = "Settings";
+
+}
+
+
+
+    <div class="text-center">
+        <h1 class="display-4">Welcome</h1>
+        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    </div>
+    <ul class="text-center">
+        <li><h1 class="display-4">Settings</h1></li>
+        <li><span>corsUrl : @ViewBag.corsUrl</span><br></li>
+        <li><span>clientId : @ViewBag.clientId</span><br/></li>
+        <li><span>authority : @ViewBag.authority</span><br/></li>
+    </ul>
+    
+    <ul>
+    @foreach (var val in Context.Request.Headers)
+    {
+        <li> @val.Key = @val.Value</li>
+    }
+    </ul>
+    
+
+@if (!string.IsNullOrWhiteSpace(Context.Request.Query["errormessage"]))
+{
+    <div style="background-color:red;color:white;font-weight: bold;">Error: @Context.Request.Query["errormessage"]</div>
+}

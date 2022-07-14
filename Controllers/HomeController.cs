@@ -36,7 +36,8 @@ namespace MvcCode.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var url = this.HttpContext.Request.Cookies.ContainsKey("urlCallback") ? this.HttpContext.Request.Cookies["urlCallback"] : "index";
+            
+            var url = this.HttpContext.Request.Cookies.ContainsKey("urlCallback") ? this.HttpContext.Request.Cookies["urlCallback"] : "";
             if (User.Identity!.IsAuthenticated && !string.IsNullOrWhiteSpace(url))
             {
                 return Redirect(url);
@@ -49,7 +50,7 @@ namespace MvcCode.Controllers
         {
             if (!User.Identity!.IsAuthenticated)
             {
-                var url = this.HttpContext.Request.Cookies.ContainsKey("urlCallback") ? this.HttpContext.Request.Cookies["urlCallback"] : "index";
+                var url = this.HttpContext.Request.Cookies.ContainsKey("urlCallback") ? this.HttpContext.Request.Cookies["urlCallback"] : "Index";
                 return Redirect(url);
             }
 
@@ -63,6 +64,8 @@ namespace MvcCode.Controllers
             authenticationProperties.RedirectUri = Url.Action(nameof(Callback));
             return Challenge(authenticationProperties, OpenIdConnectDefaults.AuthenticationScheme);
         }
+
+        
         [AllowAnonymous]
         public IActionResult Login1(string redirect, string urlCallback)
         {
@@ -71,6 +74,17 @@ namespace MvcCode.Controllers
             if (!string.IsNullOrWhiteSpace(redirect))
                 this.HttpContext.Session.SetString("redirect", redirect);
             return Redirect("Login");
+        }
+        [AllowAnonymous]
+        public IActionResult Settings()
+        {
+            this.ViewBag.corsUrl = _configuration.GetValue<string>(
+               "ServerSettings:corsUrl");
+            this.ViewBag.clientId= _configuration.GetValue<string>(
+               "ServerSettings:clientId");
+            this.ViewBag.authority= _configuration.GetValue<string>(
+               "ServerSettings:authority");
+            return View();
         }
         [HttpGet]
         public async Task<IActionResult> Callback(string returnUrl = null, string remoteError = null)
