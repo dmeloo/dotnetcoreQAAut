@@ -86,33 +86,35 @@ namespace MvcCode
                     options.UsePkce = true;
                     options.Scope.Clear();
                     options.Scope.Add("openid");
-                    options.Scope.Add("profile");
+                    options.Scope.Add("co_scope");
                     options.Scope.Add("email");
-                    options.UseTokenLifetime = false;
+
+
+                    //options.UseTokenLifetime = false;
                     options.GetClaimsFromUserInfoEndpoint = true;
                     options.SaveTokens = true;
-                    options.SecurityTokenValidator = new JwtSecurityTokenHandler
-                    {
-                        InboundClaimTypeMap = new Dictionary<string, string>()
-                    };
+                    //options.SecurityTokenValidator = new JwtSecurityTokenHandler
+                   // {
+                    //    InboundClaimTypeMap = new Dictionary<string, string>()
+                    //};
 
-                    options.TokenValidationParameters.NameClaimType = "name";
-                    options.TokenValidationParameters.RoleClaimType = "role";
-                    options.TokenValidationParameters.ValidateIssuer = false;
+                    //options.TokenValidationParameters.NameClaimType = "name";
+                    //options.TokenValidationParameters.RoleClaimType = "role";
+                    //options.TokenValidationParameters.ValidateIssuer = false;
+
+                    options.ClaimActions.MapAllExcept("iss", "nbf", "exp", "aud", "nonce", "iat", "c_hash");
                     options.Events = new OpenIdConnectEvents
                     {
-                        OnRedirectToIdentityProviderForSignOut = context =>{
-                            Console.WriteLine("logot event");
-                            var authInfo = context.Properties.GetTokenValue("id_token");
-                            var idToken = context.HttpContext.GetTokenAsync("id_token");
-                            Console.WriteLine(idToken.Result);
+                     
+                        OnRedirectToIdentityProviderForSignOut = async context =>{
+                            var authenticateInfo = context.Properties.GetTokenValue("id_token");
 
-                            if(idToken.Result != null && !context.Properties.Items.ContainsKey("id_token_hint"))
-                                context.ProtocolMessage.SetParameter("id_token_hint",idToken.Result);
-                            context.ProtocolMessage.IdToken = idToken.Result;
+                            var idToken = await context.HttpContext.GetTokenAsync("id_token");
 
-                            Console.WriteLine(context.ProtocolMessage.IdToken);
-                            return Task.FromResult(0);
+                            if (idToken != null && !context.Properties.Items.ContainsKey("id_token_hint"))
+                                context.ProtocolMessage.SetParameter("id_token_hint", idToken);
+                            //context.ProtocolMessage.IdToken = idToken;
+                         
                         },
                         OnRedirectToIdentityProvider = context =>
                         {
