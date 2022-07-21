@@ -20,44 +20,72 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace MvcCode.Controllers
 {
+    /// <summary>
+    /// Clase que representa el controller principal de la aplicación.
+    /// </summary>
     public class HomeController : Controller
     {
+        /// <summary>
+        /// Elemento que permite acceder a la configuración del sistema
+        /// </summary>
         private readonly IConfiguration _configuration;
-
-        private readonly IMemoryCache _cache;
-
-
-        public HomeController(IConfiguration _config, IMemoryCache cache)
+        /// <summary>
+        /// Url del trámite a la que pertenece el trámite.
+        /// </summary>
+        private string TramiteUrl
+        {
+            get
+            {
+                return _configuration.GetValue<string>(
+               "ServerSettings:tramiteUrl");
+            }
+        }
+        /// <summary>
+        /// Inicializa una instancia del controlador.
+        /// </summary>
+        /// <param name="_config">Elemento que permite acceder a la configuración.</param>
+        public HomeController(IConfiguration _config)
         {
             _configuration = _config;
-            _cache = cache;
         }
 
+
+        /// <summary>
+        /// Acción principal que redirigue a la url de trámite después de realizar la acción logueo o deslogueo.
+        /// </summary>
+        /// <returns></returns>
         [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            
-            var url = this.HttpContext.Request.Cookies.ContainsKey("urlCallback") ? this.HttpContext.Request.Cookies["urlCallback"] : "";
-            if (User.Identity!.IsAuthenticated && !string.IsNullOrWhiteSpace(url))
+
+            var url = TramiteUrl;
+            if (!string.IsNullOrWhiteSpace(url))
             {
                 return Redirect(url);
             }
 
             return View();
         }
+        /// <summary>
+        /// Realiza el deslogue de la aplicación para el usuario actual.
+        /// </summary>
+        /// <returns></returns>
         [AllowAnonymous]
         public IActionResult Logout()
         {
             if (!User.Identity!.IsAuthenticated)
             {
-                var url = this.HttpContext.Request.Cookies.ContainsKey("urlCallback") ? this.HttpContext.Request.Cookies["urlCallback"] : "Index";
+                var url = TramiteUrl;
                 return Redirect(url);
             }
 
             return SignOut(CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme);
 
         }
-
+        /// <summary>
+        /// Realiza el proceso de logueo en autenticación digital.
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Login()
         {
             var authenticationProperties = new AuthenticationProperties();
@@ -65,27 +93,28 @@ namespace MvcCode.Controllers
             return Challenge(authenticationProperties, OpenIdConnectDefaults.AuthenticationScheme);
         }
 
-        
-        [AllowAnonymous]
-        public IActionResult Login1(string redirect, string urlCallback)
-        {
-            if (!string.IsNullOrWhiteSpace(urlCallback))
-                this.HttpContext.Response.Cookies.Append("urlCallback", urlCallback);
-            if (!string.IsNullOrWhiteSpace(redirect))
-                this.HttpContext.Session.SetString("redirect", redirect);
-            return Redirect("Login");
-        }
+        /// <summary>
+        /// Acción que permite ver las configuraciones del sistema
+        /// </summary>
+        /// <returns></returns>
         [AllowAnonymous]
         public IActionResult Settings()
         {
-            this.ViewBag.corsUrl = _configuration.GetValue<string>(
-               "ServerSettings:corsUrl");
+            this.ViewBag.tramiteUrl = _configuration.GetValue<string>(
+               "ServerSettings:tramiteUrl");
             this.ViewBag.clientId= _configuration.GetValue<string>(
                "ServerSettings:clientId");
             this.ViewBag.authority= _configuration.GetValue<string>(
                "ServerSettings:authority");
             return View();
         }
+        /// <summary>
+        /// Interno acción de apoyo al proceso de Auth 2.0.
+        /// </summary>
+        /// <param name="returnUrl">url de retorno</param>
+        /// <param name="remoteError">Error del sistema externo.</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         [HttpGet]
         public async Task<IActionResult> Callback(string returnUrl = null, string remoteError = null)
         {
@@ -118,6 +147,12 @@ namespace MvcCode.Controllers
             return Redirect("~/");
 
         }
+        /// <summary>
+        /// Otiene la información del usuario desde el sistema externo
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         private async Task<(IdentityUser user, string provider, string providerUserId, IEnumerable<Claim> claims)>
       FindUserFromExternalProviderAsync(AuthenticateResult result)
         {
@@ -143,6 +178,12 @@ namespace MvcCode.Controllers
             //return (user, provider, providerUserId, claims);
             return (null, provider, providerUserId, claims);
         }
+        /// <summary>
+        /// Interno que de apoyo al proceso de autenticación.
+        /// </summary>
+        /// <param name="externalResult"></param>
+        /// <param name="localClaims"></param>
+        /// <param name="localSignInProps"></param>
         private void ProcessLoginCallbackForOidc(AuthenticateResult externalResult, List<Claim> localClaims, AuthenticationProperties localSignInProps)
         {
             // if the external system sent a session id claim, copy it over
@@ -160,6 +201,10 @@ namespace MvcCode.Controllers
                 localSignInProps.StoreTokens(new[] { new AuthenticationToken { Name = "id_token", Value = id_token } });
             }
         }
+        /// <summary>
+        /// Acción que permite ingresar a personalizar el usuario actual en autenticación digital.
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> PersonalizarAsync()
         {
             if (User.Identity!.IsAuthenticated)
@@ -188,6 +233,10 @@ namespace MvcCode.Controllers
             }
             return Redirect("Index");
         }
+        /// <summary>
+        /// Acción que permite hacer deslogueo del usuario actual.
+        /// </summary>
+        /// <returns></returns>
         public IActionResult SingleSignOut()
         {
             var authenticationProperties = new AuthenticationProperties();
@@ -195,7 +244,10 @@ namespace MvcCode.Controllers
                "ServerSettings:redirectUri");
             return Challenge(authenticationProperties, OpenIdConnectDefaults.AuthenticationScheme);
         }
-
+        /// <summary>
+        /// Página que permite mantener la sesión activa.
+        /// </summary>
+        /// <returns></returns>
         [AllowAnonymous]
         public IActionResult Alive()
         {
@@ -203,8 +255,11 @@ namespace MvcCode.Controllers
                 return View();
             return View("index");
         }
+        /// <summary>
+        /// Acción liviana que permite no caduque la sesión.
+        /// </summary>
+        /// <returns></returns>
         [AllowAnonymous]
-
         public IActionResult KeepAlive()
         {
             return Json(new object());

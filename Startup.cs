@@ -20,19 +20,29 @@ namespace MvcCode
 {
     public class Startup
     {
+        /// <summary>
+        /// Elemento que permite acceder a la configuración.
+        /// </summary>
         public IConfiguration Configuration { get; private set; }
-
+        /// <summary>
+        /// Inicializa una instancia de la clase.
+        /// </summary>
+        /// <param name="configuration"></param>
         public Startup(IConfiguration configuration)
         {
             this.Configuration = configuration;
         }
+        /// <summary>
+        /// Configura los servicios a los que acede la aplicación.
+        /// </summary>
+        /// <param name="services">Colección de servicios configurados en la aplicación.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            string corsUrl = Configuration.GetValue<string>(
-               "ServerSettings:corsUrl");
+            string tramiteUrl = Configuration.GetValue<string>(
+               "ServerSettings:tramiteUrl");
+            var uri = new Uri(tramiteUrl);
 
-            string redirectUri = Configuration.GetValue<string>(
-               "ServerSettings:redirectUri");
+            string corsUrl = tramiteUrl.Replace(uri.LocalPath, "/");
 
             string clientId = Configuration.GetValue<string>(
                "ServerSettings:clientId");
@@ -42,9 +52,6 @@ namespace MvcCode
 
             string authority = Configuration.GetValue<string>(
                "ServerSettings:authority");
-
-            string redirectUriLogout = Configuration.GetValue<string>(
-               "ServerSettings:redirectUriLogout");
 
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
             services.AddDistributedMemoryCache();
@@ -90,31 +97,20 @@ namespace MvcCode
                     options.Scope.Add("email");
 
 
-                    //options.UseTokenLifetime = false;
                     options.GetClaimsFromUserInfoEndpoint = true;
                     options.SaveTokens = true;
-                    //options.SecurityTokenValidator = new JwtSecurityTokenHandler
-                   // {
-                    //    InboundClaimTypeMap = new Dictionary<string, string>()
-                    //};
-
-                    //options.TokenValidationParameters.NameClaimType = "name";
-                    //options.TokenValidationParameters.RoleClaimType = "role";
-                    //options.TokenValidationParameters.ValidateIssuer = false;
 
                     options.ClaimActions.MapAllExcept("iss", "nbf", "exp", "aud", "nonce", "iat", "c_hash");
                     options.Events = new OpenIdConnectEvents
                     {
-                     
-                        OnRedirectToIdentityProviderForSignOut = async context =>{
-                            var authenticateInfo = context.Properties.GetTokenValue("id_token");
 
+                        OnRedirectToIdentityProviderForSignOut = async context =>
+                        {
                             var idToken = await context.HttpContext.GetTokenAsync("id_token");
 
                             if (idToken != null && !context.Properties.Items.ContainsKey("id_token_hint"))
                                 context.ProtocolMessage.SetParameter("id_token_hint", idToken);
-                            //context.ProtocolMessage.IdToken = idToken;
-                         
+
                         },
                         OnRedirectToIdentityProvider = context =>
                         {
@@ -154,16 +150,7 @@ namespace MvcCode
                         },
                         OnTokenValidated = context =>
                         {
-                            Console.WriteLine("Set Claims");
-                            /*var userClaims = context.Principal!.Identity as System.Security.Claims.ClaimsIdentity;
-                            if (userClaims != null)
-                            {
-                                userClaims.AddClaim(new Claim("id_token", context.ProtocolMessage.IdToken));
-                                userClaims.AddClaim(new Claim("access_token", context.ProtocolMessage.AccessToken));
-                                userClaims.AddClaim(new Claim("audd", userClaims!.FindFirst("aud")!.Value));
-                                userClaims.AddClaim(new Claim("isss", userClaims!.FindFirst("iss")!.Value));
-                            }*/
-                            
+
                             return Task.CompletedTask;
                         },
                     };
@@ -172,34 +159,29 @@ namespace MvcCode
 
             services.AddSession();
 
-	services.AddMemoryCache();
+            services.AddMemoryCache();
 
-    services.AddCors(options =>
-            {
-                options.AddPolicy("PermitirApiRequest",
-                builder =>
-                {
-                    builder.WithOrigins(corsUrl??"https://localhost:5001/")
-                     .AllowAnyMethod()
-                     .AllowAnyHeader()
-                     .AllowCredentials()
-                     ;
-                });
-            });
-
-            // services.Configure<CookiePolicyOptions>(options =>
-            // {
-            // //This lambda determines whether user consent for non-essential cookies is needed for a given request.
-            //     options.CheckConsentNeeded = context => true;
-            //     options.MinimumSameSitePolicy = SameSiteMode.None;
-            // });
+            services.AddCors(options =>
+                    {
+                        options.AddPolicy("PermitirApiRequest",
+                        builder =>
+                        {
+                            builder.WithOrigins(corsUrl ?? "https://localhost:5001/")
+                             .AllowAnyMethod()
+                             .AllowAnyHeader()
+                             .AllowCredentials()
+                             ;
+                        });
+                    });
         }
-
+        /// <summary>
+        /// Configura las capacidades del sistema.
+        /// </summary>
+        /// <param name="app">Aplicación actual</param>
         public void Configure(IApplicationBuilder app)
         {
             app.UseDeveloperExceptionPage();
-            //app.UseHttpsRedirection();
-             app.UseStaticFiles();
+            app.UseStaticFiles();
             app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedProto });
             app.UseRouting();
             app.UseSession();
@@ -209,8 +191,6 @@ namespace MvcCode
 
             app.UseSession();
             app.UseCors("PermitirApiRequest");
-            
-            //app.UseCookiePolicy();
 
             app.UseEndpoints(endpoints =>
             {
