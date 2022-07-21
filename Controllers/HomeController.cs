@@ -73,12 +73,7 @@ namespace MvcCode.Controllers
         [AllowAnonymous]
         public IActionResult Logout()
         {
-            if (!User.Identity!.IsAuthenticated)
-            {
-                var url = TramiteUrl;
-                return Redirect(url);
-            }
-
+            
             return SignOut(CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme);
 
         }

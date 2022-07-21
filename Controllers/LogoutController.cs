@@ -24,24 +24,14 @@ namespace MvcCode.Controllers
         private readonly IConfiguration _config;
         public LogoutController(IConfiguration _config)
         {
-            //_signinManager = signinManager;
             this._config = _config;
         }
-
-
-        public async Task<IActionResult> Home()
-        {
-            //await _signinManager.SignOutAsync(/**/);
-
-            var client = new HttpClient();
-            var authConfiguration = _config.GetSection("AuthConfiguration");
-            var clientId_aud = authConfiguration["Audience"];
-
-            var disco = await client.GetDiscoveryDocumentAsync(authConfiguration["StsServerIdentityUrl"]);
-
-            return Redirect(disco.EndSessionEndpoint);
-        }
-
+        /// <summary>
+        /// Realiza el deslogue de esta aplicación.
+        /// </summary>
+        /// <param name="sid"></param>
+        /// <param name="iss"></param>
+        /// <returns></returns>
         public async Task<IActionResult> FrontChannelLogout(string sid, string iss)
         {
             if (User.Identity.IsAuthenticated)
@@ -50,7 +40,6 @@ namespace MvcCode.Controllers
                 if (string.Equals(currentSid, sid, StringComparison.Ordinal))
                 {
                     await this.HttpContext.SignOutAsync();
-                    //await _signinManager.SignOutAsync(/*CookieAuthenticationDefaults.AuthenticationScheme*/);
                 }
             }
 
