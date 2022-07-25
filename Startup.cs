@@ -42,7 +42,7 @@ namespace MvcCode
                "ServerSettings:tramiteUrl");
             var uri = new Uri(tramiteUrl);
 
-            string corsUrl = tramiteUrl.Replace(uri.LocalPath, "/");
+            string corsUrl = tramiteUrl.Replace(uri.LocalPath, "");
 
             string clientId = Configuration.GetValue<string>(
                "ServerSettings:clientId");
